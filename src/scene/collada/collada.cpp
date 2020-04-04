@@ -926,9 +926,13 @@ void ColladaParser::parse_material ( XMLElement* xml, MaterialInfo& material ) {
         e_bsdf = e_bsdf->NextSiblingElement();
       }
     } else if (tech_common) {
-      XMLElement* e_diffuse = get_element(tech_common, "phong/diffuse/color");
-      if (e_diffuse) {
-        Spectrum reflectance = spectrum_from_string(string(e_diffuse->GetText()));
+      XMLElement* e_lambert_diffuse = get_element(tech_common, "lambert/diffuse/color");
+      XMLElement* e_phong_diffuse = get_element(tech_common, "phong/diffuse/color");
+      if (e_lambert_diffuse) {
+        Spectrum reflectance = spectrum_from_string(string(e_lambert_diffuse->GetText()));
+        material.bsdf = new DiffuseBSDF(reflectance);
+      } else if (e_phong_diffuse) {
+        Spectrum reflectance = spectrum_from_string(string(e_phong_diffuse->GetText()));
         material.bsdf = new DiffuseBSDF(reflectance);
       } else {
         material.bsdf = new DiffuseBSDF(Spectrum(.5f,.5f,.5f));
